@@ -3,7 +3,7 @@ var Comment = React.createClass({
         return (
             <div className="comment">
                 <h2 className="commentAuthor">
-                    {this.props.author}   { moment(this.props.date).format("DD.MM.YYYY") }
+                    { moment(this.props.date).format("DD.MM.YYYY") }  {this.props.author}
                 </h2>
                 {this.props.children}
             </div>
@@ -118,7 +118,7 @@ var CommentBox = React.createClass({
                 this.setState({authorList: response});
             }.bind(this),
             error: function(xhr, status, err) {
-                console.error(this.props.commentUrl, status, err.toString());
+                console.error(this.props.authorUrl, status, err.toString());
             }.bind(this)
         });
     },
@@ -134,7 +134,7 @@ var CommentBox = React.createClass({
                 this.loadAuthorsFromServer();
             }.bind(this),
             error: function(xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
+                console.error(this.props.commentUrl, status, err.toString());
             }.bind(this)
         });
     },

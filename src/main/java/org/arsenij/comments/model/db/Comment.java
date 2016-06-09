@@ -19,7 +19,7 @@ public class Comment {
     @Column(name = "text", nullable = false, columnDefinition = "TEXT")
     private String text;
 
-    @Column(name = "add_date", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "add_date", nullable = false)
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime date;
 

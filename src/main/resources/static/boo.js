@@ -54,17 +54,19 @@ var CommentForm = React.createClass({
         this.setState({author: '', text: ''});
     },
     chooseDefaultAuthor: function() {
-      if(this.props.authorList.length < 1) {
+      if(this.props.authorList.includes(this.state.author)) {
+          return this.state.author
+      } else if(this.props.authorList.length < 1) {
           return "";
       } else {
           return this.props.authorList[0];
       }
     },
+
     render: function() {
         var authors = this.props.authorList.map(function(author, idx){
-            //  <option selected={idx === 0} value={author.name}>{author.name}</option>
             return (
-                <option value={author.name}>{author.name}</option>
+                <option value={author.name} key={idx}>{author.name}</option>
             );
         });
         return (
@@ -75,7 +77,7 @@ var CommentForm = React.createClass({
                     value={this.state.author}
                     onChange={this.handleAuthorChange}
                     />
-                <select size="1" value={this.chooseDefaultAuthor()}>
+                <select size="1" defaultValue={this.chooseDefaultAuthor()} onChange={this.handleAuthorListChange}>
                     {authors}
                 </select>
                 <input
@@ -139,7 +141,7 @@ var CommentBox = React.createClass({
     componentDidMount: function() {
         this.loadCommentsFromServer();
         this.loadAuthorsFromServer();
-        setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+        //setInterval(this.loadCommentsFromServer, this.props.pollInterval);
     },
     render: function() {
         return (

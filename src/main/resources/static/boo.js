@@ -29,20 +29,25 @@ var CommentList = React.createClass({
 });
 
 var CommentForm = React.createClass({
+
     getInitialState: function() {
         return {author: '', text: ''};
     },
+
     handleAuthorListChange: function(e) {
         console.log("author list changed");
         console.log(e.target.value);
         this.setState({author: e.target.value});
     },
+
     handleAuthorChange: function(e) {
         this.setState({author: e.target.value});
     },
+
     handleTextChange: function(e) {
         this.setState({text: e.target.value});
     },
+
     handleSubmit: function(e) {
         e.preventDefault();
         var author = this.state.author.trim();
@@ -53,6 +58,7 @@ var CommentForm = React.createClass({
         this.props.onCommentSubmit({authorName: author, text: text});
         this.setState({author: '', text: ''});
     },
+
     chooseDefaultAuthor: function() {
       if(this.props.authorList.includes(this.state.author)) {
           return this.state.author
@@ -93,22 +99,51 @@ var CommentForm = React.createClass({
 });
 
 var CommentBox = React.createClass({
+
     getInitialState: function() {
-        return {comments: [], authorList: []};
+        return {
+            comments: [],
+            authorList: [],
+            order: "DATE_DESC",
+            limit: 3,
+            offset: 0,
+            total: 0
+        };
     },
+
     loadCommentsFromServer: function() {
+        this.loadCommentsFromServerWithStep(this.state.offset, this.state.order);
+    },
+
+    loadCommentsFromServerWithStep: function(newOffset, newOrder) {
+        console.log("get comments offset " + newOffset);
+        console.log("get comments order " + newOrder);
         $.ajax({
             url: this.props.commentUrl,
+            data: {
+                order: newOrder,
+                limit: this.state.limit,
+                offset: newOffset,
+            },
             dataType: 'json',
             cache: false,
             success: function(response) {
-                this.setState({comments: response.comments});
+                console.log('limit ' + response.limit);
+                console.log('offset ' + response.offset);
+                console.log('total ' + response.total);
+                this.setState({
+                    comments: response.comments,
+                    limit: response.limit,
+                    offset: response.offset,
+                    total: response.total
+                });
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error(this.props.commentUrl, status, err.toString());
             }.bind(this)
         });
     },
+
     loadAuthorsFromServer: function() {
         $.ajax({
             url: this.props.authorUrl,
@@ -122,6 +157,7 @@ var CommentBox = React.createClass({
             }.bind(this)
         });
     },
+
     handleCommentSubmit: function(comment) {
         $.ajax({
             url: this.props.commentUrl,
@@ -137,16 +173,51 @@ var CommentBox = React.createClass({
             }.bind(this)
         });
     },
+
+    onOrderChange: function(e) {
+        console.log("order list changed");
+        console.log(e.target.value);
+        this.setState({order: e.target.value});
+        this.loadCommentsFromServerWithStep(this.state.offset, e.target.value);
+    },
+    
     componentDidMount: function() {
+        console.log("mount");
         this.loadCommentsFromServer();
         this.loadAuthorsFromServer();
-        //setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+        setInterval(this.loadCommentsFromServer, this.props.pollInterval);
     },
+
+    onNextClick: function(e) {
+        var newOffset = this.state.offset + this.state.limit;
+        console.log("next click newOffset " + newOffset + " total " + this.state.total);
+        if( newOffset <= this.state.total ) {
+            this.loadCommentsFromServerWithStep(newOffset, this.state.order);
+        }
+    },
+
+    onPreviousClick: function(e) {
+        var newOffset = this.state.offset - this.state.limit;
+        console.log("next click newOffset " + newOffset + " total " + this.state.total);
+        if( newOffset < 0 ) {
+            newOffset = 0;
+        }
+        this.loadCommentsFromServerWithStep(newOffset, this.state.order);
+    },
+
     render: function() {
         return (
             <div className="commentBox">
                 <h1>Comments</h1>
                 <CommentList comments={this.state.comments} />
+                <div>
+                    <select size="1" defaultValue="DATE_DESC" onChange={this.onOrderChange}>
+                        <option value="DATE_DESC">По дате (убыванию)</option>
+                        <option value="DATE_ASC">По дате (возрастанию)</option>
+                    </select>
+                    <input type="submit" value="вперед" onClick={this.onNextClick}/>
+                    <input type="submit" value="назад" onClick={this.onPreviousClick}/>
+                </div>
                 <CommentForm onCommentSubmit={this.handleCommentSubmit} authorList={this.state.authorList} />
             </div>
         );

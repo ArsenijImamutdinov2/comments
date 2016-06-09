@@ -49,6 +49,7 @@ public class CommentDaoImpl extends AbstractDao implements CommentDao {
 
         final String queryStr = GET_QUERY + orderClause;
         log.debug("HQL query " + queryStr);
+        System.out.println("HQL query " + queryStr);
         Query query = getSession().createQuery(queryStr);
         query.setFirstResult(offset);
         query.setMaxResults(limit);

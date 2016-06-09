@@ -13,9 +13,9 @@ var Comment = React.createClass({
 
 var CommentList = React.createClass({
     render: function() {
-        var commentNodes = this.props.comments.map(function(comment) {
+        var commentNodes = this.props.comments.map(function(comment, idx) {
             return (
-                <Comment author={comment.author.name} date={comment.date} key={comment.id}>
+                <Comment author={comment.author.name} date={comment.date} key={idx}>
                     {comment.text}
                 </Comment>
             );
@@ -125,7 +125,6 @@ var CommentBox = React.createClass({
     handleCommentSubmit: function(comment) {
         $.ajax({
             url: this.props.commentUrl,
-            dataType: 'json',
             type: 'POST',
             contentType:'application/json',
             data: JSON.stringify(comment),

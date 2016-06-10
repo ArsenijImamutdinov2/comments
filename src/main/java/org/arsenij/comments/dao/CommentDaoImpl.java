@@ -21,6 +21,8 @@ public class CommentDaoImpl extends AbstractDao implements CommentDao {
     final static private String GET_QUERY = "select comment from Comment comment ";
     final static private String ORDER_DATE_ASC = " order by comment.date asc";
     final static private String ORDER_DATE_DESC = " order by comment.date desc";
+    final static private String ORDER_AUTHOR_ASC = " order by comment.author asc";
+    final static private String ORDER_AUTHO_DESC = " order by comment.author desc";
 
     @Override
     public void save(final Comment comment) {
@@ -44,6 +46,12 @@ public class CommentDaoImpl extends AbstractDao implements CommentDao {
                 break;
             case DATE_DESC:
                 orderClause = ORDER_DATE_DESC;
+                break;
+            case AUTHOR_ASC:
+                orderClause = ORDER_AUTHOR_ASC;
+                break;
+            case AUTHOR_DESC:
+                orderClause = ORDER_AUTHO_DESC;
                 break;
         }
 

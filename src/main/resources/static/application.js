@@ -75,11 +75,15 @@ var CommentForm = React.createClass({
                 <option value={author.name} key={idx}>{author.name}</option>
             );
         });
+        var classes = "commentForm";
+        if(!this.props.addComment) {
+            classes += " hidden"
+        }
         return (
-            <form className="commentForm" onSubmit={this.handleSubmit}>
+            <form className={classes} onSubmit={this.handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Your name"
+                    placeholder="Имя автора"
                     value={this.state.author}
                     onChange={this.handleAuthorChange}
                     />
@@ -88,12 +92,40 @@ var CommentForm = React.createClass({
                 </select>
                 <input
                     type="text"
-                    placeholder="Say something..."
+                    placeholder="Текст"
                     value={this.state.text}
                     onChange={this.handleTextChange}
                     />
-                <input type="submit" value="Post" />
+                <input type="submit" value="Добавить" />
+                <input type="button" value="Закрыть" onClick={this.props.close}/>
             </form>
+        );
+    }
+});
+
+// <Pages limit = {this.state.limit} offset={this.state.offset} total={this.state.total}/>
+var Pages = React.createClass({
+    totalPages: function() {
+        if (this.props.total === 0) {
+            return 0;
+        } else {
+            var hold = Math.floor(this.props.total / this.props.limit);
+            if (this.props.total % this.props.limit != 0) {
+                hold += 1;
+            }
+            return hold
+        }
+    },
+    currentPage: function() {
+        if (this.props.total === 0) {
+            return 0;
+        } else {
+            return Math.floor(this.props.offset / this.props.limit) + 1;
+        }
+    },
+    render: function() {
+        return (
+            <span> {this.currentPage()} / {this.totalPages()} </span>
         );
     }
 });
@@ -107,7 +139,8 @@ var CommentBox = React.createClass({
             order: "DATE_DESC",
             limit: 3,
             offset: 0,
-            total: 0
+            total: 0,
+            addComment: false,
         };
     },
 
@@ -165,6 +198,7 @@ var CommentBox = React.createClass({
             contentType:'application/json',
             data: JSON.stringify(comment),
             success: function() {
+                this.onCloseAddClick()
                 this.loadCommentsFromServer();
                 this.loadAuthorsFromServer();
             }.bind(this),
@@ -180,7 +214,7 @@ var CommentBox = React.createClass({
         this.setState({order: e.target.value});
         this.loadCommentsFromServerWithStep(this.state.offset, e.target.value);
     },
-    
+
     componentDidMount: function() {
         console.log("mount");
         this.loadCommentsFromServer();
@@ -205,20 +239,37 @@ var CommentBox = React.createClass({
         this.loadCommentsFromServerWithStep(newOffset, this.state.order);
     },
 
+    onAddClick: function() {
+        this.setState({addComment: true})
+    },
+
+    onCloseAddClick: function() {
+        this.setState({addComment: false})
+    },
+
     render: function() {
         return (
             <div className="commentBox">
-                <h1>Comments</h1>
+                <h1>Цитаты</h1>
                 <CommentList comments={this.state.comments} />
                 <div>
                     <select size="1" defaultValue="DATE_DESC" onChange={this.onOrderChange}>
                         <option value="DATE_DESC">По дате (убыванию)</option>
                         <option value="DATE_ASC">По дате (возрастанию)</option>
+                        <option value="AUTHOR_DESC">По по автору (убыванию)</option>
+                        <option value="AUTHOR_ASC">По по автору (возрастанию)</option>
                     </select>
-                    <input type="submit" value="вперед" onClick={this.onNextClick}/>
-                    <input type="submit" value="назад" onClick={this.onPreviousClick}/>
+                    <input type="button" value="назад" onClick={this.onPreviousClick}/>
+                    <Pages limit = {this.state.limit} offset={this.state.offset} total={this.state.total}/>
+                    <input type="button" value="вперед" onClick={this.onNextClick}/>
+                    <input type="button" value="добавить" onClick={this.onAddClick}/>
                 </div>
-                <CommentForm onCommentSubmit={this.handleCommentSubmit} authorList={this.state.authorList} />
+                <CommentForm
+                    onCommentSubmit={this.handleCommentSubmit}
+                    authorList={this.state.authorList}
+                    addComment={this.state.addComment}
+                    close={this.onCloseAddClick}
+                />
             </div>
         );
     }

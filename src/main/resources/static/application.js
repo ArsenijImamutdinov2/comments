@@ -5,7 +5,7 @@ var Comment = React.createClass({
                 <h2 className="commentAuthor">
                     { moment(this.props.date).format("DD.MM.YYYY") }  {this.props.author}
                 </h2>
-                {this.props.children}
+                <p className="comment-par">{this.props.children}</p>
             </div>
         );
     }
@@ -81,27 +81,46 @@ var CommentForm = React.createClass({
         }
         return (
             <form className={classes} onSubmit={this.handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Имя автора"
-                    value={this.state.author}
-                    onChange={this.handleAuthorChange}
-                    />
-                <select size="1" defaultValue={this.chooseDefaultAuthor()} onChange={this.handleAuthorListChange}>
-                    {authors}
-                </select>
-                <input
-                    type="text"
-                    placeholder="Текст"
-                    value={this.state.text}
-                    onChange={this.handleTextChange}
-                    />
-                <input type="submit" value="Добавить" />
-                <input type="button" value="Закрыть" onClick={this.props.close}/>
+                <div>
+                    <input
+                        className="common-margins"
+                        type="text"
+                        placeholder="Имя автора"
+                        value={this.state.author}
+                        onChange={this.handleAuthorChange}
+                        />
+                    <select
+                        className="common-margins"
+                        size="1"
+                        defaultValue={this.chooseDefaultAuthor()}
+                        onChange={this.handleAuthorListChange}
+                    >
+                        {authors}
+                    </select>
+                </div>
+                <div className="common-margins">
+                    <textarea
+                        placeholder="Текст"
+                        value={this.state.text}
+                        onChange={this.handleTextChange}
+                        cols="60"
+                        rows="5"/>
+                </div>
+                <div>
+                    <input className="common-margins" type="submit" value="Добавить" />
+                    <input className="common-margins" type="button" value="Закрыть" onClick={this.props.close}/>
+                </div>
             </form>
         );
     }
 });
+//<input
+//    type="text"
+//    placeholder="Текст"
+//    value={this.state.text}
+//    onChange={this.handleTextChange}
+//    multiline
+//    />
 
 // <Pages limit = {this.state.limit} offset={this.state.offset} total={this.state.total}/>
 var Pages = React.createClass({
@@ -252,24 +271,30 @@ var CommentBox = React.createClass({
             <div className="commentBox">
                 <h1>Цитаты</h1>
                 <CommentList comments={this.state.comments} />
+                <div className="sort-control">
+                    <div className="selecter">
+                        <span>Сортировка по: </span>
+                        <select size="1" defaultValue="DATE_DESC" onChange={this.onOrderChange}>
+                            <option value="DATE_DESC">По дате (убыванию)</option>
+                            <option value="DATE_ASC">По дате (возрастанию)</option>
+                            <option value="AUTHOR_DESC">По по автору (убыванию)</option>
+                            <option value="AUTHOR_ASC">По по автору (возрастанию)</option>
+                        </select>
+                    </div>
+                    <input type="button" value="добавить" onClick={this.onAddClick}/>
+                    <CommentForm
+                        onCommentSubmit={this.handleCommentSubmit}
+                        authorList={this.state.authorList}
+                        addComment={this.state.addComment}
+                        close={this.onCloseAddClick}
+                    />
+                </div>
                 <div>
-                    <select size="1" defaultValue="DATE_DESC" onChange={this.onOrderChange}>
-                        <option value="DATE_DESC">По дате (убыванию)</option>
-                        <option value="DATE_ASC">По дате (возрастанию)</option>
-                        <option value="AUTHOR_DESC">По по автору (убыванию)</option>
-                        <option value="AUTHOR_ASC">По по автору (возрастанию)</option>
-                    </select>
                     <input type="button" value="назад" onClick={this.onPreviousClick}/>
                     <Pages limit = {this.state.limit} offset={this.state.offset} total={this.state.total}/>
                     <input type="button" value="вперед" onClick={this.onNextClick}/>
-                    <input type="button" value="добавить" onClick={this.onAddClick}/>
                 </div>
-                <CommentForm
-                    onCommentSubmit={this.handleCommentSubmit}
-                    authorList={this.state.authorList}
-                    addComment={this.state.addComment}
-                    close={this.onCloseAddClick}
-                />
+
             </div>
         );
     }

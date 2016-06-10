@@ -7,3 +7,33 @@
 .show {
     display: inherit;
 }
+
+.comment {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+
+.comment-par {
+    width: 40ch;
+}
+
+.sort-control {
+    position: absolute;
+    top: 80px;
+    left: 60ch;
+    width: 100ch;
+    height: 100px;
+}
+
+.selecter {
+    margin-bottom: 1ch;
+}
+
+.commentForm {
+    margin-top: 2ch;
+    widht: 60ch;
+}
+
+.common-margins {
+    margin: 5px 5px 5px 5px;
+}
